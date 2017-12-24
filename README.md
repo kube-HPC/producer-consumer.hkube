@@ -1,6 +1,6 @@
 # Producer consumer message queue
 
-producer consumer message queue based on Redis built for Node.js
+producer consumer message queue based on Redis built for Node.js    
 
 ## Installation
 

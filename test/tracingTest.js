@@ -102,7 +102,7 @@ describe('Tracing', () => {
                 expect(data.jobID).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
                 expect(data.options.data.spanId).to.not.be.empty
-                expect(tracer._tracer._reporter.spans).to.have.lengthOf(1);
+                expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
                 resolve();
             });
             const consumer = new Consumer(options);
@@ -142,7 +142,7 @@ describe('Tracing', () => {
                 expect(data.jobID).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
                 expect(data.options.data.spanId).to.not.be.empty
-                expect(tracer._tracer._reporter.spans).to.have.lengthOf(1);
+                expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
                 resolve();
             });
             const consumer = new Consumer(options);
@@ -186,9 +186,13 @@ describe('Tracing', () => {
                 expect(data.jobID).to.be.a('string');
                 expect(data.error).to.equal('Nooooooo!!!!!');
                 expect(data.options.data.spanId).to.not.be.empty
-                expect(tracer._tracer._reporter.spans).to.have.lengthOf(1);
+                expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
                 expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.Error, value: true });
                 expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'errorMessage', value: 'Nooooooo!!!!!' });
+                expect(tracer._tracer._reporter.spans[0]._operationName).to.eq('tracing-test-3 start');
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.Error, value: true });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'errorMessage', value: 'Nooooooo!!!!!' });
+                expect(tracer._tracer._reporter.spans[1]._operationName).to.eq('producer');
                 resolve();
             });
             const consumer = new Consumer(options);

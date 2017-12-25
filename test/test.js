@@ -84,8 +84,6 @@ describe('Test', function () {
                         redis: {
                             host: '127.0.0.1',
                             port: "6379",
-                            cluster: true,
-                            sentinel: false
                         }
                     }
                 }
@@ -98,6 +96,32 @@ describe('Test', function () {
                 const consumer = new Consumer(options);
                 consumer.on('job', (job) => {
                     job.done(new Error('test-job has been failed'))
+                });
+                consumer.register(options);
+                producer.createJob(options);
+            });
+            it('should create call job-failed when queue.process callback throws', function (done) {
+                const options = {
+                    job: {
+                        type: 'test-job-job-event-failed-throw',
+                        data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: {
+                            host: '127.0.0.1',
+                            port: "6379",
+                        }
+                    }
+                }
+                const producer = new Producer(options);
+                producer.on('job-failed', (data) => {
+                    expect(data.jobID).to.be.a('string');
+                    expect(data.error).to.equal('No!!!!!!');
+                    done();
+                });
+                const consumer = new Consumer(options);
+                consumer.on('job', (job) => {
+                    throw new Error('No!!!!!!');
                 });
                 consumer.register(options);
                 producer.createJob(options);

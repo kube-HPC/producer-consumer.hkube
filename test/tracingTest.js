@@ -37,18 +37,18 @@ const globalOptions = {
 }
 
 describe('Tracing', () => {
-    beforeEach((done) => {
-        tracer._spanStack = [];
-        if (tracer._tracer) {
-            tracer._tracer.close(() => {
-                tracer._tracer = null;
-                done();
-            });
-        }
-        else {
-            done();
-        }
-    });
+    // beforeEach((done) => {
+    //     tracer._spanStack = [];
+    //     if (tracer._tracer) {
+    //         tracer._tracer.close(() => {
+    //             tracer._tracer = null;
+    //             done();
+    //         });
+    //     }
+    //     else {
+    //         done();
+    //     }
+    // });
     it('should work without tracing', (done) => {
         let job = null;
         const res = { success: true };
@@ -127,17 +127,25 @@ describe('Tracing', () => {
         });
         let job = null;
         const res = { success: true };
-        const options = {
+        const optionsProducer = {
             job: {
-                type: 'tracing-test-2',
+                type: 'tracing-test-2a',
                 data: { action: 'bla' },
             },
             setting: {
                 tracer
             }
         }
-        return new Promise((resolve, reject) => {
-            const producer = new Producer(options);
+        const optionsConsumer = {
+            job: {
+                type: 'tracing-test-2a',
+            },
+            setting: {
+                tracer
+            }
+        }
+        const prom =  new Promise((resolve, reject) => {
+            const producer = new Producer(optionsProducer);
             producer.on('job-completed', (data) => {
                 expect(data.jobID).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
@@ -145,15 +153,15 @@ describe('Tracing', () => {
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
                 resolve();
             });
-            const consumer = new Consumer(options);
+            const consumer = new Consumer(optionsConsumer);
             consumer.on('job', (job) => {
                 expect(job.data.spanId).to.not.be.empty
                 job.done(null, res);
             });
-            consumer.register(options);
-            producer.createJob(options);
+            consumer.register(optionsConsumer);
+            producer.createJob(optionsProducer);
         });
-        
+        await prom;
     });
     it('should work with job-failed', async () => {
         await tracer.init({

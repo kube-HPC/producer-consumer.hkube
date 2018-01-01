@@ -115,6 +115,56 @@ describe('Tracing', () => {
         });
         
     });
+
+    it('should add tags', async () => {
+        await tracer.init({
+            tracerConfig: {
+                serviceName: 'test',
+            },
+            tracerOptions: {
+                reporter: new InMemoryReporter()
+            }
+
+        });
+        let job = null;
+        const res = { success: true };
+        const options = {
+            job: {
+                type: 'tracing-test-tags',
+                data: { action: 'bla' },
+            },
+            tracing: {
+                tags: {
+                    tag1:'val1'
+                }
+            },
+            setting: {
+                tracer
+            }
+        }
+        return new Promise((resolve, reject) => {
+            const producer = new Producer(options);
+            producer.on('job-completed', (data) => {
+                expect(data.jobID).to.be.a('string');
+                expect(data.result).to.deep.equal(res);
+                expect(data.options.data.spanId).to.not.be.empty
+                expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'jobID', value: data.jobID });
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'tag1', value: 'val1' });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'jobID', value: data.jobID });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'tag1', value: 'val1' });
+                resolve();
+            });
+            const consumer = new Consumer(options);
+            consumer.on('job', (job) => {
+                expect(job.data.spanId).to.not.be.empty
+                job.done(null, res);
+            });
+            consumer.register(options);
+            producer.createJob(options);
+        });
+        
+    });
     it('should work without options.tracing job-completed', async () => {
         await tracer.init({
             tracerConfig: {

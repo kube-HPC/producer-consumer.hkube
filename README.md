@@ -1,11 +1,14 @@
-# Producer consumer message queue
+# Producer consumer
+
+[![Build Status](https://travis-ci.org/kube-HPC/producer-consumer.hkube.svg?branch=master)](https://travis-ci.org/kube-HPC/producer-consumer.hkube)
+[![Coverage Status](https://coveralls.io/repos/github/kube-HPC/producer-consumer.hkube/badge.svg?branch=master)](https://coveralls.io/github/kube-HPC/producer-consumer.hkube?branch=master)
 
 producer consumer message queue based on Redis built for Node.js    
 
 ## Installation
 
 ```bash
-$ npm install producer-consumer.rf
+$ npm install @hkube/producer-consumer
 ```
 
 ## Basic usage
@@ -14,7 +17,7 @@ $ npm install producer-consumer.rf
 
 ```js
 
-const { Producer } = require('producer-consumer.rf');
+const { Producer } = require('@hkube/producer-consumer');
 const options = {
     job: {
         type: 'test-job',
@@ -30,7 +33,7 @@ const job = await producer.createJob(options);
 
 ```js
 
-const { Consumer } = require('producer-consumer.rf');
+const { Consumer } = require('@hkube/producer-consumer');
 const options = {
     job: {
         type: 'test-job'
@@ -137,7 +140,7 @@ const schema = {
 ## Events
 
 ```js
-const { Producer } = require('producer-consumer.rf');
+const { Producer } = require('@hkube/producer-consumer');
 producer.on('job-failed', (jobID, err) => {       
 }).on('job-completed', (jobID, result) => {           
 }).on('job-active', (jobID) => {             
@@ -157,7 +160,7 @@ const job = await producer.createJob(options);
 ## Full Detailed Example
 
 ```js
-const { producer } = require('producer-consumer.rf');
+const { producer } = require('@hkube/producer-consumer');
 const options = {
     job: {
         resolveOnStart: false,
@@ -188,9 +191,6 @@ const options = {
 const job = await producer.createJob(options);
 
 ```
-
-## Credits
-
 
 ## License
 

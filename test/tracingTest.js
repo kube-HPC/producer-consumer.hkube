@@ -245,10 +245,10 @@ describe('Tracing', () => {
                 expect(data.error).to.equal('Nooooooo!!!!!');
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
-                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.Error, value: true });
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
                 expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'errorMessage', value: 'Nooooooo!!!!!' });
                 expect(tracer._tracer._reporter.spans[0]._operationName).to.eq('tracing-test-3 start');
-                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.Error, value: true });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
                 expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'errorMessage', value: 'Nooooooo!!!!!' });
                 expect(tracer._tracer._reporter.spans[1]._operationName).to.eq('producer');
                 resolve();
@@ -257,6 +257,56 @@ describe('Tracing', () => {
             consumer.on('job', (job) => {
                 expect(job.data.spanId).to.not.be.empty
                 job.done(new Error('Nooooooo!!!!!'));
+            });
+            consumer.register(options);
+            producer.createJob(options);
+        });
+        
+    });
+    xit('should work with job-failed empty error', async () => {
+        await tracer.init({
+            tracerConfig: {
+                serviceName: 'test',
+            },
+            tracerOptions: {
+                reporter: new InMemoryReporter()
+            }
+
+        });
+        let job = null;
+        const res = { success: true };
+        const options = {
+            job: {
+                type: 'tracing-test-4',
+                data: { action: 'bla' },
+            },
+            tracing: {
+
+            },
+            setting: {
+                tracer
+            }
+        }
+
+        return new Promise((resolve, reject) => {
+            const producer = new Producer(options);
+            producer.on('job-failed', (data) => {
+                expect(data.jobID).to.be.a('string');
+                expect(data.error).to.not.exist
+                expect(data.options.data.spanId).to.not.be.empty
+                expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'errorMessage', value: undefined });
+                expect(tracer._tracer._reporter.spans[0]._operationName).to.eq('tracing-test-4 start');
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'errorMessage', value: "" });
+                expect(tracer._tracer._reporter.spans[1]._operationName).to.eq('producer');
+                resolve();
+            });
+            const consumer = new Consumer(options);
+            consumer.on('job', (job) => {
+                expect(job.data.spanId).to.not.be.empty
+                job.done({});
             });
             consumer.register(options);
             producer.createJob(options);

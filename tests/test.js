@@ -3,10 +3,10 @@ const Redis = require('ioredis');
 const { Producer, Consumer } = require('../index');
 const Queue = require('bull');
 
-const redisHost = process.env.REDIS_CLUSTER_SERVICE_HOST || '127.0.0.1';
-const redisPort = process.env.REDIS_CLUSTER_SERVICE_PORT || "6379";
-const useCluster = process.env.REDIS_CLUSTER_SERVICE_HOST ? true : false;
-const redisConfig = { host: redisHost, port: redisPort, cluster: useCluster };
+const redisHost = process.env.REDIS_SENTINEL_SERVICE_HOST || '127.0.0.1';
+const redisPort = process.env.REDIS_SENTINEL_SERVICE_PORT || "6379";
+const useSentinel = process.env.REDIS_SENTINEL_SERVICE_HOST ? true : false;
+const redisConfig = { host: redisHost, port: redisPort, sentinel: useSentinel };
 
 const globalOptions = {
     job: {
@@ -24,12 +24,7 @@ const globalOptions = {
     },
     setting: {
         prefix: 'sf-jobs',
-        redis: {
-            host: '127.0.0.1',
-            port: "6379",
-            cluster: true,
-            sentinel: false
-        }
+        redis: redisConfig
     }
 }
 
@@ -39,7 +34,8 @@ describe('Test', function () {
             it('should throw validation error is no options', function () {
                 const options = {
                     setting: {
-                        prefix: 1
+                        prefix: 1,
+                        redis: redisConfig
                     }
                 };
                 expect(() => new Producer(options)).to.throw('data.prefix should be string');
@@ -49,6 +45,9 @@ describe('Test', function () {
                     job: {
                         type: 'test-job',
                         waitingTimeout: 'bla'
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 };
                 const producer = new Producer(options);
@@ -58,7 +57,13 @@ describe('Test', function () {
                 });
             });
             it('should throw validation error is required', function (done) {
-                const options = { job: {} };
+                const options = {
+                    job: {
+                    },
+                    setting: {
+                        redis: redisConfig
+                    }
+                };
                 const producer = new Producer(options);
                 producer.createJob(options).catch((error) => {
                     expect(error.message).to.equal("data.job should have required property 'type'");
@@ -81,10 +86,7 @@ describe('Test', function () {
                         data: { action: 'bla' }
                     },
                     setting: {
-                        redis: {
-                            host: '127.0.0.1',
-                            port: "6379",
-                        }
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -107,10 +109,7 @@ describe('Test', function () {
                         data: { action: 'bla' }
                     },
                     setting: {
-                        redis: {
-                            host: '127.0.0.1',
-                            port: "6379",
-                        }
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -133,6 +132,9 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-job-event-completed',
                         data: { action: 'bla' },
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -154,6 +156,9 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-job-event-active',
                         data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -172,6 +177,9 @@ describe('Test', function () {
                         type: 'test-job-job-event-active-resolveOnStart',
                         data: { action: 'bla' },
                         resolveOnStart: true
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -195,6 +203,9 @@ describe('Test', function () {
                         type: 'test-job-job-event-active-resolveOnStart',
                         data: { action: 'bla' },
                         resolveOnWaiting: true
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -219,6 +230,9 @@ describe('Test', function () {
                         type: 'test-job-job-completed',
                         data: { action: 'bla' },
                         resolveOnComplete: true
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -243,7 +257,8 @@ describe('Test', function () {
                         resolveOnStart: true
                     },
                     setting: {
-                        prefix: 'sf-jobs-reject-timeout'
+                        prefix: 'sf-jobs-reject-timeout',
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -260,7 +275,8 @@ describe('Test', function () {
                         waitingTimeout: 5000
                     },
                     setting: {
-                        prefix: 'sf-jobs1'
+                        prefix: 'sf-jobs1',
+                        redis: redisConfig
                     }
                 }
                 const options2 = {
@@ -270,7 +286,8 @@ describe('Test', function () {
                         waitingTimeout: 5000
                     },
                     setting: {
-                        prefix: 'sf-jobs2'
+                        prefix: 'sf-jobs2',
+                        redis: redisConfig
                     }
                 }
                 const res1 = { success: 'consumer-result-1' };
@@ -303,7 +320,8 @@ describe('Test', function () {
                         type: 'test-job',
                     },
                     setting: {
-                        prefix: []
+                        prefix: [],
+                        redis: redisConfig
                     }
                 };
                 const func = () => new Consumer(options)
@@ -316,6 +334,9 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-properties',
                         data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -338,6 +359,9 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-pause',
                         data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -356,6 +380,9 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-resume',
                         data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -379,7 +406,8 @@ describe('Test', function () {
                         data: { action: 'test' }
                     },
                     setting: {
-                        prefix: 'jobs-stress'
+                        prefix: 'jobs-stress',
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);
@@ -399,7 +427,8 @@ describe('Test', function () {
                         data: { action: 'test' }
                     },
                     setting: {
-                        prefix: 'jobs-stress-2'
+                        prefix: 'jobs-stress-2',
+                        redis: redisConfig
                     }
                 }
                 const producer = new Producer(options);

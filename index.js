@@ -4,4 +4,4 @@ const Consumer = require('./lib/consumer/consumer');
 module.exports = {
     Producer,
     Consumer
-}
+};

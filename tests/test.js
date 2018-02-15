@@ -38,11 +38,11 @@ describe('Test', function () {
         describe('Validation', function () {
             it('should throw validation error is no options', function () {
                 const options = {
-                    setting:{
-                        prefix:1
+                    setting: {
+                        prefix: 1
                     }
                 };
-                expect(()=>new Producer(options)).to.throw('data.prefix should be string');
+                expect(() => new Producer(options)).to.throw('data.prefix should be string');
             });
             it('should throw validation error is not typeof', function (done) {
                 const options = {
@@ -171,18 +171,18 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-job-event-active-resolveOnStart',
                         data: { action: 'bla' },
-                        resolveOnStart:true
+                        resolveOnStart: true
                     }
                 }
                 const producer = new Producer(options);
-                let activeFlag=false;
+                let activeFlag = false;
                 producer.on('job-active', (data) => {
                     expect(data.jobID).to.be.a('string');
-                    activeFlag=true;
+                    activeFlag = true;
                 });
                 const consumer = new Consumer(options);
                 consumer.register(options);
-                producer.createJob(options).then((data)=>{
+                producer.createJob(options).then((data) => {
                     expect(data.jobID).to.be.a('string');
                     expect(activeFlag).to.be.true;
                     done();
@@ -194,18 +194,18 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-job-event-active-resolveOnStart',
                         data: { action: 'bla' },
-                        resolveOnWaiting:true
+                        resolveOnWaiting: true
                     }
                 }
                 const producer = new Producer(options);
-                let activeFlag=false;
+                let activeFlag = false;
                 producer.on('job-waiting', (data) => {
                     expect(data.jobID).to.be.a('string');
-                    activeFlag=true;
+                    activeFlag = true;
                 });
                 const consumer = new Consumer(options);
                 consumer.register(options);
-                producer.createJob(options).then((data)=>{
+                producer.createJob(options).then((data) => {
                     expect(data.jobID).to.be.a('string');
                     expect(activeFlag).to.be.true;
                     done();
@@ -250,7 +250,7 @@ describe('Test', function () {
                 producer.createJob(options).catch(error => {
                     expect(error.message).to.have.string('job-waiting-timeout');
                     done();
-                }); 
+                });
             });
             it('should create two differnt jobs', async function () {
                 const options1 = {

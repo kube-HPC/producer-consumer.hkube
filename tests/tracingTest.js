@@ -36,7 +36,7 @@ const globalOptions = {
     }
 }
 
-describe('Tracing', () => {
+xdescribe('Tracing', () => {
     // beforeEach((done) => {
     //     tracer._spanStack = [];
     //     if (tracer._tracer) {
@@ -71,7 +71,6 @@ describe('Tracing', () => {
         consumer.register(options);
         producer.createJob(options);
     });
-
     it('should work with job-completed', async () => {
         await tracer.init({
             tracerConfig: {
@@ -113,9 +112,8 @@ describe('Tracing', () => {
             consumer.register(options);
             producer.createJob(options);
         });
-        
-    });
 
+    });
     it('should add tags', async () => {
         await tracer.init({
             tracerConfig: {
@@ -135,7 +133,7 @@ describe('Tracing', () => {
             },
             tracing: {
                 tags: {
-                    tag1:'val1'
+                    tag1: 'val1'
                 }
             },
             setting: {
@@ -163,7 +161,7 @@ describe('Tracing', () => {
             consumer.register(options);
             producer.createJob(options);
         });
-        
+
     });
     it('should work without options.tracing job-completed', async () => {
         await tracer.init({
@@ -194,7 +192,7 @@ describe('Tracing', () => {
                 tracer
             }
         }
-        const prom =  new Promise((resolve, reject) => {
+        const prom = new Promise((resolve, reject) => {
             const producer = new Producer(optionsProducer);
             producer.on('job-completed', (data) => {
                 expect(data.jobID).to.be.a('string');
@@ -261,6 +259,6 @@ describe('Tracing', () => {
             consumer.register(options);
             producer.createJob(options);
         });
-        
+
     });
 });

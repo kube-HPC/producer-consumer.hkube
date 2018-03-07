@@ -36,7 +36,7 @@ const globalOptions = {
     }
 }
 
-xdescribe('Tracing', () => {
+describe('Tracing', () => {
     // beforeEach((done) => {
     //     tracer._spanStack = [];
     //     if (tracer._tracer) {

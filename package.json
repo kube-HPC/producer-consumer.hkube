@@ -12,7 +12,8 @@
     "bull": "^3.1.0",
     "djsv": "^3.0.3",
     "ioredis": "^3.1.4",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "snyk": "^1.88.0"
   },
   "devDependencies": {
     "@hkube/metrics": "^1.0.22",
@@ -29,8 +30,11 @@
   "scripts": {
     "test": "mocha tests --colors --recursive --exit",
     "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec tests --exit",
-    "build": "npm publish"
+    "build": "npm publish",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "Nassi Harel",
-  "license": "ISC"
+  "license": "ISC",
+  "snyk": true
 }

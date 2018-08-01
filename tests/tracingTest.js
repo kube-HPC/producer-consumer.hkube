@@ -36,7 +36,7 @@ const globalOptions = {
     }
 }
 
-xdescribe('Tracing', () => {
+describe('Tracing', () => {
     // beforeEach((done) => {
     //     tracer._spanStack = [];
     //     if (tracer._tracer) {
@@ -243,10 +243,10 @@ xdescribe('Tracing', () => {
                 expect(data.error).to.equal('Nooooooo!!!!!');
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
-                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.Tags.ERROR, value: true });
                 expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'errorMessage', value: 'Nooooooo!!!!!' });
                 expect(tracer._tracer._reporter.spans[0]._operationName).to.eq('tracing-test-3 start');
-                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.Tags.ERROR, value: true });
                 expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'errorMessage', value: 'Nooooooo!!!!!' });
                 expect(tracer._tracer._reporter.spans[1]._operationName).to.eq('producer');
                 resolve();
@@ -293,10 +293,10 @@ xdescribe('Tracing', () => {
                 expect(data.error).to.not.exist
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
-                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: opentracing.Tags.ERROR, value: true });
                 expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'errorMessage', value: undefined });
                 expect(tracer._tracer._reporter.spans[0]._operationName).to.eq('tracing-test-4 start');
-                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.ERROR, value: true });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: opentracing.Tags.ERROR, value: true });
                 expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'errorMessage', value: "" });
                 expect(tracer._tracer._reporter.spans[1]._operationName).to.eq('producer');
                 resolve();

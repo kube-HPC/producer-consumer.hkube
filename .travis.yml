@@ -29,7 +29,7 @@ after_success:
 deploy:
   skip_cleanup: true
   provider: npm
-  email: yehiyam@gmail.com
+  email: nassi9@gmail.com
   api_key: "$NPM_AUTH_TOKEN"
   on:
     branch: master

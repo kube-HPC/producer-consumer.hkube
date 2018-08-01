@@ -1,7 +1,5 @@
 const { expect } = require('chai');
-const Redis = require('ioredis');
 const { Producer, Consumer } = require('../index');
-const Queue = require('bull');
 
 const redisHost = process.env.REDIS_SENTINEL_SERVICE_HOST || '127.0.0.1';
 const redisPort = process.env.REDIS_SENTINEL_SERVICE_PORT || "6379";
@@ -34,7 +32,7 @@ describe('Test', function () {
             it('should throw validation error is no options', function () {
                 const options = {
                     setting: {
-                        prefix: 1,
+                        prefix: [],
                         redis: redisConfig
                     }
                 };

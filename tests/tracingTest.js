@@ -58,7 +58,7 @@ describe('Tracing', () => {
         }
         const producer = new Producer(options);
         producer.on('job-completed', (data) => {
-            expect(data.jobID).to.be.a('string');
+            expect(data.jobId).to.be.a('string');
             expect(data.result).to.deep.equal(res);
             done();
         });
@@ -96,7 +96,7 @@ describe('Tracing', () => {
         return new Promise((resolve, reject) => {
             const producer = new Producer(options);
             producer.on('job-completed', (data) => {
-                expect(data.jobID).to.be.a('string');
+                expect(data.jobId).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
@@ -141,13 +141,13 @@ describe('Tracing', () => {
         return new Promise((resolve, reject) => {
             const producer = new Producer(options);
             producer.on('job-completed', (data) => {
-                expect(data.jobID).to.be.a('string');
+                expect(data.jobId).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
-                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'jobID', value: data.jobID });
+                expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'jobId', value: data.jobId });
                 expect(tracer._tracer._reporter.spans[0]._tags).to.deep.include({ key: 'tag1', value: 'val1' });
-                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'jobID', value: data.jobID });
+                expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'jobId', value: data.jobId });
                 expect(tracer._tracer._reporter.spans[1]._tags).to.deep.include({ key: 'tag1', value: 'val1' });
                 resolve();
             });
@@ -193,7 +193,7 @@ describe('Tracing', () => {
         const prom = new Promise((resolve, reject) => {
             const producer = new Producer(optionsProducer);
             producer.on('job-completed', (data) => {
-                expect(data.jobID).to.be.a('string');
+                expect(data.jobId).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
@@ -237,7 +237,7 @@ describe('Tracing', () => {
         return new Promise((resolve, reject) => {
             const producer = new Producer(options);
             producer.on('job-failed', (data) => {
-                expect(data.jobID).to.be.a('string');
+                expect(data.jobId).to.be.a('string');
                 expect(data.error).to.equal('Nooooooo!!!!!');
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);
@@ -287,7 +287,7 @@ describe('Tracing', () => {
         return new Promise((resolve, reject) => {
             const producer = new Producer(options);
             producer.on('job-failed', (data) => {
-                expect(data.jobID).to.be.a('string');
+                expect(data.jobId).to.be.a('string');
                 expect(data.error).to.not.exist
                 expect(data.options.data.spanId).to.not.be.empty
                 expect(tracer._tracer._reporter.spans).to.have.lengthOf(2);

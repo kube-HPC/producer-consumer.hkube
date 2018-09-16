@@ -72,8 +72,8 @@ describe('Test', function () {
         describe('CreateJob', function () {
             it('should create job and return job id', function (done) {
                 const producer = new Producer(globalOptions);
-                producer.createJob(globalOptions).then((jobID) => {
-                    expect(jobID).to.be.a('string');
+                producer.createJob(globalOptions).then((jobId) => {
+                    expect(jobId).to.be.a('string');
                     done();
                 });
             });
@@ -89,7 +89,7 @@ describe('Test', function () {
                 }
                 const producer = new Producer(options);
                 producer.on('job-failed', (data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     expect(data.error).to.equal('test-job has been failed');
                     done();
                 });
@@ -112,7 +112,7 @@ describe('Test', function () {
                 }
                 const producer = new Producer(options);
                 producer.on('job-failed', (data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     expect(data.error).to.equal('No!!!!!!');
                     done();
                 });
@@ -137,7 +137,7 @@ describe('Test', function () {
                 }
                 const producer = new Producer(options);
                 producer.on('job-completed', (data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     expect(data.result).to.deep.equal(res);
                     done();
                 });
@@ -161,7 +161,7 @@ describe('Test', function () {
                 }
                 const producer = new Producer(options);
                 producer.on('job-active', (data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     done();
                 });
                 const consumer = new Consumer(options);
@@ -183,13 +183,13 @@ describe('Test', function () {
                 const producer = new Producer(options);
                 let activeFlag = false;
                 producer.on('job-active', (data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     activeFlag = true;
                 });
                 const consumer = new Consumer(options);
                 consumer.register(options);
                 producer.createJob(options).then((data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     expect(activeFlag).to.be.true;
                     done();
                 });
@@ -209,13 +209,13 @@ describe('Test', function () {
                 const producer = new Producer(options);
                 let activeFlag = false;
                 producer.on('job-waiting', (data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     activeFlag = true;
                 });
                 const consumer = new Consumer(options);
                 consumer.register(options);
                 producer.createJob(options).then((data) => {
-                    expect(data.jobID).to.be.a('string');
+                    expect(data.jobId).to.be.a('string');
                     expect(activeFlag).to.be.true;
                     done();
                 });
@@ -240,7 +240,7 @@ describe('Test', function () {
                 });
                 consumer.register(options);
                 const data = await producer.createJob(options);
-                expect(data.jobID).to.be.a('string');
+                expect(data.jobId).to.be.a('string');
                 expect(data.result).to.deep.equal(res);
             });
             it('should create job and reject on timeout', function (done) {

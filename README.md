@@ -141,9 +141,9 @@ const schema = {
 
 ```js
 const { Producer } = require('@hkube/producer-consumer');
-producer.on('job-failed', (jobID, err) => {       
-}).on('job-completed', (jobID, result) => {           
-}).on('job-active', (jobID) => {             
+producer.on('job-failed', (jobId, err) => {       
+}).on('job-completed', (jobId, result) => {           
+}).on('job-active', (jobId) => {             
 });
 producer.createJob(options);
 

@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@hkube/redis-utils": "^1.0.3",
-    "bull": "^3.4.4",
+    "bull": "^3.4.8",
     "djsv": "^3.0.3",
     "uuid": "^3.1.0"
   },

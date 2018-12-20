@@ -84,7 +84,10 @@ describe('Test', function () {
                         data: { action: 'bla' }
                     },
                     setting: {
-                        redis: redisConfig
+                        redis: redisConfig,
+                        settings: {
+                            stalledInterval: -1
+                        }
                     }
                 }
                 const producer = new Producer(options);
@@ -194,11 +197,11 @@ describe('Test', function () {
                     done();
                 });
             });
-            it('should create job fire event job-waiting (resolveOnWaiting)', function (done) {
+            xit('should create job fire event job-waiting (resolveOnWaiting)', function (done) {
                 this.timeout(5000);
                 const options = {
                     job: {
-                        type: 'test-job-job-event-active-resolveOnStart',
+                        type: 'test-job-job-event-waiting-resolveOnStart',
                         data: { action: 'bla' },
                         resolveOnWaiting: true
                     },

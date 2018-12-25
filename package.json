@@ -8,9 +8,9 @@
     "tests": "tests"
   },
   "dependencies": {
+    "@hkube/bull": "^3.5.2",
     "@hkube/redis-utils": "^1.0.3",
     "ajv": "^6.6.2",
-    "bull": "^3.4.8",
     "uuid": "^3.1.0"
   },
   "devDependencies": {

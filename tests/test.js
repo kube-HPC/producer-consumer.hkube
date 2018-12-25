@@ -26,6 +26,8 @@ const globalOptions = {
     }
 }
 
+const delay = d => new Promise(r => setTimeout(r, d));
+
 describe('Test', function () {
     describe('Producer', function () {
         describe('Validation', function () {
@@ -223,7 +225,6 @@ describe('Test', function () {
                     done();
                 });
             });
-
             it('should create job and resolve on completed', async function () {
                 const res = { success: true };
                 const options = {
@@ -310,6 +311,15 @@ describe('Test', function () {
 
                 const results = await Promise.all([producer1.createJob(options1), producer2.createJob(options2)]);
                 expect(results).to.have.lengthOf(2);
+            });
+        });
+        describe('StalledJobs', function () {
+            it('should get stalled jobs array', async function () {
+                const producer = new Producer(globalOptions);
+                const queue = producer._createQueue('stalled');
+                await delay(1000)
+                const stalled = await producer._checkStalledJobs(queue);
+                expect(stalled).to.be.an('array');
             });
         });
     });

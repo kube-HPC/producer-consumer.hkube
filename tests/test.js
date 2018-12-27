@@ -269,7 +269,7 @@ describe('Test', function () {
                     done();
                 });
             });
-            it('should create two differnt jobs', async function () {
+            it('should create two different jobs', async function () {
                 const options1 = {
                     job: {
                         type: 'test-job-ids',

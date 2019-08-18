@@ -8,14 +8,13 @@
     "tests": "tests"
   },
   "dependencies": {
-    "@hkube/bull": "^3.5.3",
+    "@hkube/bull": "^3.10.2",
     "@hkube/redis-utils": "^1.0.3",
-    "ajv": "^6.6.2",
-    "uuid": "^3.1.0",
-    "snyk": "^1.189.0"
+    "ajv": "^6.10.2",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "@hkube/metrics": "^1.0.22",
+    "@hkube/metrics": "^1.0.33",
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
     "eslint": "^5.11.1",
@@ -31,11 +30,8 @@
     "test": "NODE_ENV=test node_modules/mocha/bin/mocha tests --colors --recursive --exit",
     "test:cov": "NODE_ENV=test ./node_modules/nyc/bin/nyc.js --reporter=html --reporter=text --reporter=lcov mocha tests --colors --recursive --exit",
     "coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "build": "npm publish",
-    "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "build": "npm publish"
   },
   "author": "Nassi Harel",
-  "license": "ISC",
-  "snyk": true
+  "license": "ISC"
 }

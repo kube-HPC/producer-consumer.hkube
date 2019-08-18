@@ -1,7 +1,7 @@
 sudo: required
 language: node_js
 node_js:
-- '8'
+- '10'
 services:
 - redis
 branches:
@@ -9,8 +9,6 @@ branches:
   - master
 install:
 - npm install
-- npm install -g snyk
-- snyk test || true
 cache:
   directories:
   - node_modules
@@ -18,14 +16,18 @@ script:
 - npm run lint && npm run test:cov
 after_script: npm run coverage
 after_success:
-- git config --global user.email "travis@travis-ci.org"
-- git config --global user.name "Travis CI"
-- git remote set-url --push origin "https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git"
-- git remote -v
-- git checkout -f -b version-branch
-- npm version patch -m "$(git log -1 --pretty=%B) .... bump version [skip ci]"
-- git push origin version-branch:master --follow-tags
-- snyk monitor
+- |
+  if ([ "$TRAVIS_BRANCH" == "master" ] || [ ! -z "$TRAVIS_TAG" ]) && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    git config --global user.email "travis@travis-ci.org"
+    git config --global user.name "Travis CI"
+    git remote set-url --push origin "https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git"
+    git remote -v
+    git checkout -f -b version-branch
+    npm version patch -m "$(git log -1 --pretty=%B) .... bump version [skip ci]"
+    git push origin version-branch:master --follow-tags
+  else
+    echo "version skiped!"
+  fi
 deploy:
   skip_cleanup: true
   provider: npm

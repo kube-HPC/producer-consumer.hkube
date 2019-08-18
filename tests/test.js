@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const { Producer, Consumer } = require('../index');
 
 const redisHost = process.env.REDIS_SENTINEL_SERVICE_HOST || '127.0.0.1';
@@ -318,7 +319,14 @@ describe('Test', function () {
                 const producer = new Producer(globalOptions);
                 const queue = producer._createQueue('stalled');
                 await delay(1000)
-                const stalled = await producer._checkStalledJobs(queue);
+                const stalled = await producer._getStalledJobs(queue);
+                expect(stalled).to.be.an('array');
+            });
+            it('should get stalled jobs array', async function () {
+                const producer = new Producer(globalOptions);
+                const queue = producer._createQueue('stalled');
+                await delay(1000);
+                const stalled = await producer._getStalledJobs(queue);
                 expect(stalled).to.be.an('array');
             });
         });
@@ -383,6 +391,26 @@ describe('Test', function () {
                 });
                 consumer.register(options);
                 await producer.createJob(options);
+            });
+            it('should not consume when calling pause', async function () {
+                const options = {
+                    job: {
+                        type: 'test-job-not-consume-after-pause',
+                        data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: redisConfig
+                    }
+                }
+                const callback = sinon.spy();
+                const producer = new Producer(options);
+                const consumer = new Consumer(options);
+                consumer.on('job', callback);
+                consumer.register(options);
+                await consumer.pause({ type: options.job.type });
+                await producer.createJob(options);
+                await delay(200);
+                expect(callback.called).to.be.false;
             });
         });
         describe('ResumeJob', function () {

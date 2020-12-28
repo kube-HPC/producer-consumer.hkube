@@ -154,6 +154,31 @@ describe('Test', function () {
                 consumer.register(options);
                 producer.createJob(options);
             });
+            it('should create job with prefix fire event job-completed', function (done) {
+                const res = { success: true };
+                const options = {
+                    job: {
+                        prefix: 'job-prefix',
+                        type: 'test-job-job-event-completed',
+                        data: { action: 'bla' },
+                    },
+                    setting: {
+                        redis: redisConfig
+                    }
+                }
+                const producer = new Producer(options);
+                producer.on('job-completed', (data) => {
+                    expect(data.jobId).to.be.a('string');
+                    expect(data.result).to.deep.equal(res);
+                    done();
+                });
+                const consumer = new Consumer(options);
+                consumer.on('job', (job) => {
+                    job.done(null, res);
+                });
+                consumer.register(options);
+                producer.createJob(options);
+            });
             it('should create job fire event job-active', function (done) {
                 this.timeout(5000);
                 const options = {

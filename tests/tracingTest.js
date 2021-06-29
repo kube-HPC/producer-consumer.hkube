@@ -1,54 +1,12 @@
 const { expect } = require('chai');
 const { Producer, Consumer } = require('../index');
-
-const redisHost = process.env.REDIS_CLUSTER_SERVICE_HOST || '127.0.0.1';
-const redisPort = process.env.REDIS_CLUSTER_SERVICE_PORT || "6379";
-const useCluster = process.env.REDIS_CLUSTER_SERVICE_HOST ? true : false;
-const redisConfig = { host: redisHost, port: redisPort, cluster: useCluster };
-
 const { tracer } = require('@hkube/metrics')
-const { InMemoryReporter, ConstSampler, RemoteReporter } = require('jaeger-client');
-const opentracing = require('opentracing')
-const globalOptions = {
-    job: {
-        type: 'test-job-global',
-        data: { action: 'bla' },
-        waitingTimeout: 5000
-    },
-    queue: {
-        priority: 1,
-        delay: 1000,
-        timeout: 5000,
-        attempts: 3,
-        removeOnComplete: true,
-        removeOnFail: false
-    },
-    setting: {
-        prefix: 'sf-jobs',
-        redis: {
-            host: '127.0.0.1',
-            port: "6379",
-            cluster: true,
-            sentinel: false
-        }
-    }
-}
+const { InMemoryReporter } = require('jaeger-client');
+const opentracing = require('opentracing');
+
 
 describe('Tracing', () => {
-    // beforeEach((done) => {
-    //     tracer._spanStack = [];
-    //     if (tracer._tracer) {
-    //         tracer._tracer.close(() => {
-    //             tracer._tracer = null;
-    //             done();
-    //         });
-    //     }
-    //     else {
-    //         done();
-    //     }
-    // });
     it('should work without tracing', (done) => {
-        let job = null;
         const res = { success: true };
         const options = {
             job: {
@@ -77,9 +35,7 @@ describe('Tracing', () => {
             tracerOptions: {
                 reporter: new InMemoryReporter()
             }
-
         });
-        let job = null;
         const res = { success: true };
         const options = {
             job: {
@@ -110,7 +66,6 @@ describe('Tracing', () => {
             consumer.register(options);
             producer.createJob(options);
         });
-
     });
     it('should add tags', async () => {
         await tracer.init({
@@ -122,7 +77,6 @@ describe('Tracing', () => {
             }
 
         });
-        let job = null;
         const res = { success: true };
         const options = {
             job: {
@@ -171,7 +125,6 @@ describe('Tracing', () => {
             }
 
         });
-        let job = null;
         const res = { success: true };
         const optionsProducer = {
             job: {
@@ -219,8 +172,6 @@ describe('Tracing', () => {
             }
 
         });
-        let job = null;
-        const res = { success: true };
         const options = {
             job: {
                 type: 'tracing-test-3',
@@ -269,8 +220,6 @@ describe('Tracing', () => {
             }
 
         });
-        let job = null;
-        const res = { success: true };
         const options = {
             job: {
                 type: 'tracing-test-4',

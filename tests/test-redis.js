@@ -1,31 +1,53 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const uuidv4 = require('uuid/v4');
 const { Producer, Consumer } = require('../index');
 
-const redisHost = process.env.REDIS_SENTINEL_SERVICE_HOST || '127.0.0.1';
-const redisPort = process.env.REDIS_SENTINEL_SERVICE_PORT || "6379";
-const useSentinel = process.env.REDIS_SENTINEL_SERVICE_HOST ? true : false;
-const redisConfig = { host: redisHost, port: redisPort, sentinel: useSentinel };
+const provider = 'redis';
 
-const globalOptions = {
-    job: {
-        type: 'test-job-global',
-        data: { action: 'bla' },
-        waitingTimeout: 5000
+const connection = {
+    host: '127.0.0.1',
+    port: 6379,
+    sentinel: false
+};
+
+const producerOptions = {
+    provider,
+    connection,
+    options: {
+        enableCheckStalledJobs: false,
     },
-    queue: {
+    tracer: null,
+};
+
+const producerJobOptions = {
+    prefix: 'jobs',
+    type: 'test-job',
+    data: { jobId: uuidv4(), action: 'bla' },
+    options: {
         priority: 1,
         delay: 1000,
         timeout: 5000,
         attempts: 3,
+        waitingTimeout: 5000,
         removeOnComplete: true,
         removeOnFail: false
-    },
-    setting: {
-        prefix: 'sf-jobs',
-        redis: redisConfig
     }
-}
+};
+
+const consumerOptions = {
+    provider,
+    connection,
+    tracer: null,
+};
+
+const consumerJobOptions = {
+    prefix: 'jobs',
+    type: 'test-job',
+    options: {
+        concurrency: 1,
+    }
+};
 
 const delay = d => new Promise(r => setTimeout(r, d));
 
@@ -80,31 +102,19 @@ describe('Test', function () {
                     done();
                 });
             });
-            it('should create job fire event job-failed', function (done) {
-                const options = {
-                    job: {
-                        type: 'test-job-job-event-failed',
-                        data: { action: 'bla' }
-                    },
-                    setting: {
-                        redis: redisConfig,
-                        settings: {
-                            stalledInterval: -1
-                        }
-                    }
-                }
-                const producer = new Producer(options);
-                producer.on('job-failed', (data) => {
-                    expect(data.jobId).to.be.a('string');
-                    expect(data.error).to.equal('test-job has been failed');
+            it.only('should create job fire event job-failed', function (done) {
+                const producer = new Producer(producerOptions);
+                producer.on('job-failed', (err, job) => {
+                    expect(job.jobId).to.be.a('string');
+                    expect(err).to.equal('test-job has been failed');
                     done();
                 });
-                const consumer = new Consumer(options);
+                const consumer = new Consumer(consumerOptions);
                 consumer.on('job', (job) => {
                     job.done(new Error('test-job has been failed'))
                 });
-                consumer.register(options);
-                producer.createJob(options);
+                consumer.register(consumerJobOptions);
+                producer.createJob(producerJobOptions);
             });
             it('should create call job-failed when queue.process callback throws', function (done) {
                 const options = {
@@ -198,102 +208,6 @@ describe('Test', function () {
                 const consumer = new Consumer(options);
                 consumer.register(options);
                 producer.createJob(options);
-            });
-            it('should create job fire event job-active (resolveOnStart)', function (done) {
-                this.timeout(5000);
-                const options = {
-                    job: {
-                        type: 'test-job-job-event-active-resolveOnStart',
-                        data: { action: 'bla' },
-                        resolveOnStart: true
-                    },
-                    setting: {
-                        redis: redisConfig
-                    }
-                }
-                const producer = new Producer(options);
-                let activeFlag = false;
-                producer.on('job-active', (data) => {
-                    expect(data.jobId).to.be.a('string');
-                    activeFlag = true;
-                });
-                const consumer = new Consumer(options);
-                consumer.register(options);
-                producer.createJob(options).then((data) => {
-                    expect(data.jobId).to.be.a('string');
-                    expect(activeFlag).to.be.true;
-                    done();
-                });
-            });
-            xit('should create job fire event job-waiting (resolveOnWaiting)', function (done) {
-                this.timeout(5000);
-                const options = {
-                    job: {
-                        type: 'test-job-job-event-waiting-resolveOnStart',
-                        data: { action: 'bla' },
-                        resolveOnWaiting: true
-                    },
-                    setting: {
-                        redis: redisConfig
-                    }
-                }
-                const producer = new Producer(options);
-                let activeFlag = false;
-                producer.on('job-waiting', (data) => {
-                    expect(data.jobId).to.be.a('string');
-                    activeFlag = true;
-                });
-                const consumer = new Consumer(options);
-                consumer.register(options);
-                producer.createJob(options).then((data) => {
-                    expect(data.jobId).to.be.a('string');
-                    expect(activeFlag).to.be.true;
-                    done();
-                });
-            });
-            it('should create job and resolve on completed', async function () {
-                const res = { success: true };
-                const options = {
-                    job: {
-                        type: 'test-job-job-completed',
-                        data: { action: 'bla' },
-                        resolveOnComplete: true
-                    },
-                    setting: {
-                        redis: redisConfig
-                    }
-                }
-                const producer = new Producer(options);
-                const consumer = new Consumer(options);
-                consumer.on('job', (job) => {
-                    job.done(null, res);
-                });
-                consumer.register(options);
-                const data = await producer.createJob(options);
-                expect(data.jobId).to.be.a('string');
-                expect(data.result).to.deep.equal(res);
-            });
-            it('should create job and reject on timeout', function (done) {
-                this.timeout(5000);
-                let job = null;
-                const res = { success: true };
-                const options = {
-                    job: {
-                        type: 'test-job-reject-timeout',
-                        data: { action: 'bla' },
-                        waitingTimeout: 2000,
-                        resolveOnStart: true
-                    },
-                    setting: {
-                        prefix: 'sf-jobs-reject-timeout',
-                        redis: redisConfig
-                    }
-                }
-                const producer = new Producer(options);
-                producer.createJob(options).catch(error => {
-                    expect(error.message).to.have.string('job-waiting-timeout');
-                    done();
-                });
             });
             it('should create two different jobs', async function () {
                 const options1 = {

@@ -1,19 +1,17 @@
 module.exports = {
-    "extends": ["airbnb-base"],
-    "env": {
-        "es6": true,
-        "node": true,
-        "mocha": true
+    extends: ["airbnb-base"],
+    env: {
+        es6: true,
+        node: true,
+        mocha: true
     },
-    "plugins": [
-        "chai-friendly"
-    ],
-    "parserOptions": {
-        "sourceType": "module",
-        "ecmaVersion": 2020
+    plugins: ["chai-friendly"],
+    parserOptions: {
+        sourceType: "module",
+        ecmaVersion: 2020
     },
-    "rules": {
-        "no-param-reassign": "off",
+    rules: {
+        "no-param-reassign": "error",
         "prefer-template": "error",
         "no-trailing-spaces": "error",
         "no-console": "error",
@@ -21,8 +19,10 @@ module.exports = {
         "object-curly-spacing": "error",
         "no-var": "error",
         "import/newline-after-import": "off",
-        "max-len": ["error", 200],
+        "max-len": ["error", 240],
         "brace-style": ["error", "stroustrup"],
+        "indent": ["warn", 4, { "SwitchCase": 1 }],
+        "quotes": ["error", "single"],
         "comma-dangle": "off",
         "no-underscore-dangle": "off",
         "linebreake-style": "off",
@@ -31,7 +31,7 @@ module.exports = {
         "arrow-body-style": "off",
         "class-methods-use-this": "off",
         "no-unused-expressions": 0,
-        "consistent-return": "off",
-        "indent": ["warn", 4, { "SwitchCase": 1 }]
+        "arrow-parens": "off",
+        "no-nested-ternary": "off"
     }
 };

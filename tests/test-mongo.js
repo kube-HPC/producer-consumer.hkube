@@ -32,7 +32,6 @@ const producerJobOptions = {
         delay: 1000,
         timeout: 5000,
         attempts: 3,
-        waitingTimeout: 5000,
         removeOnComplete: true,
         removeOnFail: false
     }
@@ -66,22 +65,6 @@ describe('Test', function () {
                 };
                 expect(() => new Producer(options)).to.throw('data.prefix should be string');
             });
-            it('should throw validation error is not typeof', function (done) {
-                const options = {
-                    job: {
-                        type: 'test-job',
-                        waitingTimeout: 'bla'
-                    },
-                    setting: {
-                        redis: redisConfig
-                    }
-                };
-                const producer = new Producer(options);
-                producer.createJob(options).catch((error) => {
-                    expect(error.message).to.equal('data.job.waitingTimeout should be integer');
-                    done();
-                });
-            });
             it('should throw validation error is required', function (done) {
                 const options = {
                     job: {
@@ -105,19 +88,21 @@ describe('Test', function () {
                     done();
                 });
             });
-            it('should create job fire event job-failed', function (done) {
-                const producer = new Producer(producerOptions);
-                producer.on('job-failed', (data) => {
-                    expect(data.jobId).to.be.a('string');
-                    expect(data.error).to.equal('test-job has been failed');
-                    done();
+            it.only('should create job fire event job-failed', () => {
+                return new Promise(async (resolve, reject) => {
+                    const producer = new Producer(producerOptions);
+                    producer.on('job-failed', (data) => {
+                        expect(data.jobId).to.be.a('string');
+                        expect(data.error).to.equal('test-job has been failed');
+                        resolve();
+                    });
+                    const consumer = new Consumer(consumerOptions);
+                    consumer.on('job', (job) => {
+                        job.done(new Error('test-job has been failed'))
+                    });
+                    await consumer.register(consumerJobOptions);
+                    await producer.createJob(producerJobOptions);
                 });
-                const consumer = new Consumer(consumerOptions);
-                consumer.on('job', (job) => {
-                    job.done(new Error('test-job has been failed'))
-                });
-                consumer.register(consumerJobOptions);
-                producer.createJob(producerJobOptions);
             });
             it('should create call job-failed when queue.process callback throws', function (done) {
                 const options = {
@@ -217,7 +202,6 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-ids',
                         data: { action: 'test-1' },
-                        waitingTimeout: 5000
                     },
                     setting: {
                         prefix: 'sf-jobs1',
@@ -228,7 +212,6 @@ describe('Test', function () {
                     job: {
                         type: 'test-job-ids',
                         data: { action: 'test-2' },
-                        waitingTimeout: 5000
                     },
                     setting: {
                         prefix: 'sf-jobs2',

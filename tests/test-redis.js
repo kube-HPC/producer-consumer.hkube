@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const uuidv4 = require('uuid/v4');
+const { uuid } = require('@hkube/uid');
 const { Producer, Consumer } = require('../index');
 
 const provider = 'redis';
@@ -23,13 +23,12 @@ const producerOptions = {
 const producerJobOptions = {
     prefix: 'jobs',
     type: 'test-job',
-    data: { jobId: uuidv4(), action: 'bla' },
+    data: { jobId: uuid(), action: 'bla' },
     options: {
         priority: 1,
         delay: 1000,
         timeout: 5000,
         attempts: 3,
-        waitingTimeout: 5000,
         removeOnComplete: true,
         removeOnFail: false
     }
@@ -63,22 +62,6 @@ describe('Test', function () {
                 };
                 expect(() => new Producer(options)).to.throw('data.prefix should be string');
             });
-            it('should throw validation error is not typeof', function (done) {
-                const options = {
-                    job: {
-                        type: 'test-job',
-                        waitingTimeout: 'bla'
-                    },
-                    setting: {
-                        redis: redisConfig
-                    }
-                };
-                const producer = new Producer(options);
-                producer.createJob(options).catch((error) => {
-                    expect(error.message).to.equal('data.job.waitingTimeout should be integer');
-                    done();
-                });
-            });
             it('should throw validation error is required', function (done) {
                 const options = {
                     job: {
@@ -102,7 +85,7 @@ describe('Test', function () {
                     done();
                 });
             });
-            it.only('should create job fire event job-failed', function (done) {
+            it('should create job fire event job-failed', function (done) {
                 const producer = new Producer(producerOptions);
                 producer.on('job-failed', (err, job) => {
                     expect(job.jobId).to.be.a('string');
@@ -213,8 +196,7 @@ describe('Test', function () {
                 const options1 = {
                     job: {
                         type: 'test-job-ids',
-                        data: { action: 'test-1' },
-                        waitingTimeout: 5000
+                        data: { action: 'test-1' }
                     },
                     setting: {
                         prefix: 'sf-jobs1',
@@ -224,8 +206,7 @@ describe('Test', function () {
                 const options2 = {
                     job: {
                         type: 'test-job-ids',
-                        data: { action: 'test-2' },
-                        waitingTimeout: 5000
+                        data: { action: 'test-2' }
                     },
                     setting: {
                         prefix: 'sf-jobs2',

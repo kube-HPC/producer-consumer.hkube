@@ -434,6 +434,35 @@ describe('Test', function () {
                 await producer.createJob(options);
             });
         });
+        describe('Stall limit', function () {
+            it('should fire FAILED event after stall count has been reached', function (done) {
+                this.timeout(10000);
+                const options = {
+                    job: {
+                        type: 'test-job-job-event-failed-stalled',
+                        data: { action: 'bla' }
+                    },
+                    setting: {
+                        redis: redisConfig,
+                        settings: {
+                            stalledInterval: 500,
+                            lockDuration: 500,
+                            maxStalledCount: 0
+                        }
+                    }
+                }
+                const producer = new Producer(options);
+                let consumer = new Consumer(options);
+                consumer.on('job-failed', (job) => {
+                    expect(job.failedReason).to.eql('job stalled more than allowable limit')
+                    done()
+                });
+                consumer.on('job', (job) => {
+                });
+                consumer.register(options);
+                producer.createJob(options);
+            });
+        });
     });
     describe('Stress', function () {
         describe('CreateJob', function () {

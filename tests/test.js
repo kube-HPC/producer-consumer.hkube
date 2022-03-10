@@ -469,8 +469,10 @@ describe('Test', function () {
                     },
                     setting: {
                         redis: redisConfig,
+                        prefix: 'failed-stalled',
                         settings: {
                             stalledInterval: 500,
+                            lockRenewTime: 2500,
                             lockDuration: 500,
                             maxStalledCount: 0
                         }
@@ -482,8 +484,7 @@ describe('Test', function () {
                     expect(job.failedReason).to.eql('job stalled more than allowable limit')
                     done()
                 });
-                consumer.on('job', (job) => {
-                });
+
                 consumer.register(options);
                 producer.createJob(options);
             });

@@ -10,7 +10,7 @@
   "dependencies": {
     "@hkube/bull": "^3.10.2",
     "@hkube/redis-utils": "^1.0.3",
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.6",
     "uuid": "^3.1.0"
   },
   "devDependencies": {

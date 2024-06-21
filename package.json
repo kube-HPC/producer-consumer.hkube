@@ -11,7 +11,7 @@
     "@hkube/bull": "^3.10.2",
     "@hkube/redis-utils": "^1.0.3",
     "ajv": "^6.10.2",
-    "uuid": "^3.1.0"
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@hkube/metrics": "^1.0.33",
